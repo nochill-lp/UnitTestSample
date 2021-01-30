@@ -44,7 +44,7 @@ class RetrofitClient(
     }
 
     private val retrofitClient by lazy {
-        Retrofit.Builder().baseUrl("https://www.google.com")
+        Retrofit.Builder().baseUrl("https://spaceflightnewsapi.net")
             .addConverterFactory(MoshiConverterFactory.create().asLenient())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(clientBuilder.build())
