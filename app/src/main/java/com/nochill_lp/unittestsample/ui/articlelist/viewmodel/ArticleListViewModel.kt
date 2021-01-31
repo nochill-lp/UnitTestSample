@@ -2,13 +2,17 @@ package com.nochill_lp.unittestsample.ui.articlelist.viewmodel
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nochill_lp.unittestsample.data.api.RetrofitClient
 import com.nochill_lp.unittestsample.data.articles.ArticleRepository
 import com.nochill_lp.unittestsample.data.articles.ArticleService
 import com.nochill_lp.unittestsample.domain.ResultState
+import com.nochill_lp.unittestsample.domain.model.article.Article
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 
@@ -28,21 +32,13 @@ class ArticleListViewModel(
         RetrofitClient(context).createServiceAPI(ArticleService::class)
     )
 
+    private val _articlesState = MutableLiveData<ResultState<List<Article>>>()
+    val articleState: LiveData<ResultState<List<Article>>> = _articlesState
+
     fun loadArticles(){
         viewModelScope.launch {
-
-            val result = articleDataSource.getArticle()
-
-            when(result){
-                is ResultState.Success -> {
-                    result.data.forEach {
-                        Log.d("ARTICLES", "article: $it")
-                    }
-                }
-                else -> Log.d("ARTICLE", "Error loading articles")
-            }
-
-
+            _articlesState.value = ResultState.Loading
+            _articlesState.value = articleDataSource.getArticle()
         }
     }
 }
