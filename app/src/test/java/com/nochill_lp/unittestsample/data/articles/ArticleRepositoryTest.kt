@@ -5,30 +5,33 @@ import com.nochill_lp.unittestsample.domain.ResultState
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
 import com.nochill_lp.unittestsample.domain.model.article.ArticlesNotFound
 import com.nochill_lp.unittestsample.domain.model.article.article
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.unmockkAll
 import junit.framework.TestCase
 import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
 import retrofit2.Response
 
 class ArticleRepositoryTest: CoroutineBaseTest(){
 
-    /** TODO
-     * Explain what is Mockk+
-     * When is executed Before
-     * When is executed After
-     * What is a spy and a slot
-     * How to mock Static classes or Kotlin object
-     * Why is useful to unmockk all in tear down
+    /**
+     * Explain what is Mockk+ --> https://mockk.io/ An object under test may have dependencies on other (complex) objects.
+     * To isolate the behavior of the object you want to replace the other
+     * objects by mocks that simulate the behavior of the real objects
+     *
+     * When is executed Before --> method annotate with before are executed before each test. Useful when we want to execute some common code before each test
+     * When is executed After --> method annotate with after are executed after each test. Useful to clear data after each test
+     * What is a spy --> Spy allows mocking only a particular part of some class.
+     * ArgumentCaptor --> when we need to capture a parameter passed in a method we use a captured slot
+     * val slot = slot<String>() object.runMethod(capture(slot)) assertEquals("expected", slot.captured)
+     * 
+     * Verify --> Used to verify that a method of a mock object is or is not called
+     * How to mock Static classes or Kotlin object --> MockkObject and MockkStatic
+     * Why is useful to unmockk all in tear down --> clear up all mocked objectes
      */
 
     @MockK
@@ -72,6 +75,7 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
         val result = dataSource.getArticle()
 
         // Then
+        coVerify(exactly = 1) { articleService.getArticles() }
         assertTrue(result is ResultState.Success)
         assertEquals(2, (result as ResultState.Success).data.size)
     }
@@ -91,6 +95,7 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
         val result = dataSource.getArticle()
 
         // Then
+        coVerify(exactly = 1) { articleService.getArticles() }
         assertTrue(result is ResultState.Error)
         assertTrue((result as ResultState.Error).exception is ArticlesNotFound)
     }
@@ -106,6 +111,7 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
         val result = dataSource.getArticle()
 
         // Then
+        coVerify(exactly = 1) { articleService.getArticles() }
         assertTrue(result is ResultState.Success)
         assertEquals(0, (result as ResultState.Success).data.size)
     }
