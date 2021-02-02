@@ -12,6 +12,8 @@ import com.nochill_lp.unittestsample.data.articles.ArticleService
 import com.nochill_lp.unittestsample.domain.ResultState
 import com.nochill_lp.unittestsample.domain.model.article.Article
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
+import com.nochill_lp.unittestsample.ui.UIState
+import com.nochill_lp.unittestsample.ui.toUIState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -32,13 +34,14 @@ class ArticleListViewModel(
         RetrofitClient(context).createServiceAPI(ArticleService::class)
     )
 
-    private val _articlesState = MutableLiveData<ResultState<List<Article>>>()
-    val articleState: LiveData<ResultState<List<Article>>> = _articlesState
+    private val _articlesState = MutableLiveData<UIState<List<Article>>>()
+    val articleState: LiveData<UIState<List<Article>>> = _articlesState
 
     fun loadArticles(){
         viewModelScope.launch {
-            _articlesState.value = ResultState.Loading
-            _articlesState.value = articleDataSource.getArticle()
+            _articlesState.value = UIState.Loading
+            delay(2000)
+            _articlesState.value = articleDataSource.getArticle().toUIState()
         }
     }
 }

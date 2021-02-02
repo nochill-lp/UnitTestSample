@@ -11,17 +11,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.nochill_lp.unittestsample.domain.ResultState
 import com.nochill_lp.unittestsample.domain.model.article.Article
+import com.nochill_lp.unittestsample.ui.UIState
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.imageloading.ImageLoadState
 
 
 @Composable
-fun ArticleListScreen(articleState: ResultState<List<Article>>){
+fun ArticleListScreen(articleState: UIState<List<Article>>){
     MaterialTheme {
         when(articleState){
-            is ResultState.Loading -> LoadingUI()
-            is ResultState.Success -> ArticleList(articleState.data)
-            is ResultState.Error -> ErrorUI()
+            is UIState.Loading -> LoadingUI()
+            is UIState.Success -> ArticleList(articleState.data)
+            is UIState.Error -> ErrorUI()
         }
     }
 }
