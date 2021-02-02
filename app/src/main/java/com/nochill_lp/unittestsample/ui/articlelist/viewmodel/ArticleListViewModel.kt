@@ -27,12 +27,8 @@ import retrofit2.Retrofit
 */
 
 class ArticleListViewModel(
-    context: Context
+    private val articleDataSource: ArticleDataSource
 ): ViewModel() {
-
-    private val articleDataSource = ArticleRepository(
-        RetrofitClient(context).createServiceAPI(ArticleService::class)
-    )
 
     private val _articlesState = MutableLiveData<UIState<List<Article>>>()
     val articleState: LiveData<UIState<List<Article>>> = _articlesState
@@ -40,7 +36,6 @@ class ArticleListViewModel(
     fun loadArticles(){
         viewModelScope.launch {
             _articlesState.value = UIState.Loading
-            delay(2000)
             _articlesState.value = articleDataSource.getArticle().toUIState()
         }
     }
