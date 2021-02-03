@@ -2,6 +2,7 @@ package com.nochill_lp.unittestsample.data.articles
 
 import com.nochill_lp.unittestsample.CoroutineBaseTest
 import com.nochill_lp.unittestsample.domain.ResultState
+import com.nochill_lp.unittestsample.domain.model.article.Article
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
 import com.nochill_lp.unittestsample.domain.model.article.ArticlesNotFound
 import com.nochill_lp.unittestsample.domain.model.article.article
@@ -19,6 +20,7 @@ import retrofit2.Response
 class ArticleRepositoryTest: CoroutineBaseTest(){
 
     /**
+     *
      * Explain what is Mockk+ --> https://mockk.io/ An object under test may have dependencies on other (complex) objects.
      * To isolate the behavior of the object you want to replace the other
      * objects by mocks that simulate the behavior of the real objects
@@ -28,7 +30,10 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
      * What is a spy --> Spy allows mocking only a particular part of some class.
      * ArgumentCaptor --> when we need to capture a parameter passed in a method we use a captured slot
      * val slot = slot<String>() object.runMethod(capture(slot)) assertEquals("expected", slot.captured)
-     * 
+     *
+     * returns --> specify that the matched call returns a specified value
+     * answer --> specify that the matched call answers with a code block scoped with answer scope
+     *
      * Verify --> Used to verify that a method of a mock object is or is not called
      * How to mock Static classes or Kotlin object --> MockkObject and MockkStatic
      * Why is useful to unmockk all in tear down --> clear up all mocked objectes
@@ -114,6 +119,44 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
         coVerify(exactly = 1) { articleService.getArticles() }
         assertTrue(result is ResultState.Success)
         assertEquals(0, (result as ResultState.Success).data.size)
+    }
+
+
+    // Here as a test example
+    // Verify --> Used to verify that a method of a mock object is or is not called (Also use verifyOrder or verifySequence)
+    // For example in MVP architecture is useful to verify when is called a view method and to test exactly the parameters
+    @Test
+    fun `Given success response, when get articles with callback, should run on success method`(){
+
+        // Given
+        val articleCallback = mockk<ArticleDataSource.ArticleDataSourceResponse<List<Article>>>(relaxUnitFun = true)
+
+        // When
+        dataSource.getArticle(true, articleCallback)
+
+        // Should
+        verify { articleCallback.onSuccess(any()) }
+    }
+
+    // Here as a test example
+    // ArgumentCaptor --> when we need to capture a parameter passed in a method we use a captured slot
+    // * val slot = slot<String>() object.runMethod(capture(slot)) assertEquals("expected", slot.captured)
+    @Test
+    fun `Given a success response from a service, when get articles, should run on success method`(){
+
+        //Given
+        val articleCallback = mockk<ArticleDataSource.ArticleDataSourceResponse<List<Article>>>(relaxUnitFun = true)
+        val apiLibrary = mockk<ArticleDataSource.ApiLibrary<List<Article>>>(relaxUnitFun = true)
+        val slot = slot<ArticleDataSource.ApiLibrary.Callback<List<Article>>>()
+        every { apiLibrary.runApi(capture(slot)) } answers {
+            slot.captured.onApiSuccess(emptyList())
+        }
+
+        // When
+        dataSource.getArticle(apiLibrary, articleCallback)
+
+        // Should
+        verify { articleCallback.onSuccess(any()) }
     }
 
     @After

@@ -9,6 +9,7 @@ import com.nochill_lp.unittestsample.domain.model.article.ArticlesNotFound
 import com.nochill_lp.unittestsample.utils.DefaultDispatcherProvider
 import com.nochill_lp.unittestsample.utils.DispatcherProvider
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 /*
 * NTT Data Italia S.p.A.
@@ -35,4 +36,32 @@ class ArticleRepository(
             }
         }
     }
+
+    // Here for testing example
+    override fun getArticle(success: Boolean, dataSourceResponse: ArticleDataSource.ArticleDataSourceResponse<List<Article>>) {
+        if(success){
+            dataSourceResponse.onSuccess(emptyList())
+        } else{
+            dataSourceResponse.onError(ArticlesNotFound())
+        }
+
+    }
+
+    override fun getArticle(
+            apiLibrary: ArticleDataSource.ApiLibrary<List<Article>>,
+            dataSourceResponse: ArticleDataSource.ArticleDataSourceResponse<List<Article>>
+    ) {
+
+        // Api library call with callback, which returns data in another callback
+        apiLibrary.runApi(object : ArticleDataSource.ApiLibrary.Callback<List<Article>>{
+            override fun onApiSuccess(data: List<Article>) {
+                dataSourceResponse.onSuccess(data)
+            }
+
+            override fun onApiError(exception: Exception) {
+                dataSourceResponse.onError(exception)
+            }
+        })
+    }
+
 }
