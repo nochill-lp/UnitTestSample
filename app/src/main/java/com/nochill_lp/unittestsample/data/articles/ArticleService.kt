@@ -43,9 +43,7 @@ interface ArticleService {
                 imageUrl = response.imageUrl ?: ""
                 newsSite = response.newsSite ?: ""
                 summary = response.summary ?: ""
-                publishedAt = response.publishedAt?.tryParseDate("yyyy-MM-dd'T'hh:mm:ss.SSSZ")
-
-
+                publishedAt = response.publishedAt?.tryParseDate("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
             }
         }
 
