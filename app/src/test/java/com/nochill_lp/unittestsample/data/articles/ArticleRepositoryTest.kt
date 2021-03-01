@@ -1,7 +1,9 @@
 package com.nochill_lp.unittestsample.data.articles
 
 import com.nochill_lp.unittestsample.CoroutineBaseTest
+import com.nochill_lp.unittestsample.FeatureManager
 import com.nochill_lp.unittestsample.domain.ResultState
+import com.nochill_lp.unittestsample.domain.model.NumberOfResources
 import com.nochill_lp.unittestsample.domain.model.article.Article
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
 import com.nochill_lp.unittestsample.domain.model.article.ArticlesNotFound
@@ -51,7 +53,7 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
     }
 
     @Test
-    fun `Given api response success, when repository get articles, should return ResultState Success`() = coroutinesTestRule.testDispatcher.runBlockingTest {
+    fun `Given api response success, when repository get articles and number of resources limit to 1, should return ResultState Success and only 1 article`() = coroutinesTestRule.testDispatcher.runBlockingTest {
 
         // Given
         val listArticleResponse = listOf(
@@ -72,9 +74,21 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
                 newsSite = "newsSite2",
                 summary = "summary2",
                 publishedAt = "2021-02-03T11:00:00.000Z"
+            ),
+            ArticleService.ArticleResponse(
+                id = "id3",
+                title = "title3",
+                url = "url3",
+                imageUrl = "imageUrl3",
+                newsSite = "newsSite3",
+                summary = "summary3",
+                publishedAt = "2021-02-03T11:00:00.000Z"
             )
         )
         coEvery { articleService.getArticles() } returns Response.success(listArticleResponse)
+        // If we don't mock Feature Manager we are not able to have same test result when we run in demo or full
+        mockkObject(FeatureManager)
+        every { FeatureManager.numberOfArticlesAvailable() } returns NumberOfResources.Limited(1)
 
         // When
         val result = dataSource.getArticle()
@@ -82,7 +96,99 @@ class ArticleRepositoryTest: CoroutineBaseTest(){
         // Then
         coVerify(exactly = 1) { articleService.getArticles() }
         assertTrue(result is ResultState.Success)
-        assertEquals(2, (result as ResultState.Success).data.size)
+        assertEquals(1, (result as ResultState.Success).data.size)
+    }
+
+    @Test
+    fun `Given api response success, when repository get articles and number of resources is unlimited, should return ResultState Success and all available articles`() = coroutinesTestRule.testDispatcher.runBlockingTest {
+
+        // Given
+        val listArticleResponse = listOf(
+            ArticleService.ArticleResponse(
+                id = "id1",
+                title = "title1",
+                url = "url1",
+                imageUrl = "imageUrl1",
+                newsSite = "newsSite1",
+                summary = "summary1",
+                publishedAt = "2021-02-03T11:00:00.000Z"
+            ),
+            ArticleService.ArticleResponse(
+                id = "id2",
+                title = "title2",
+                url = "url2",
+                imageUrl = "imageUrl2",
+                newsSite = "newsSite2",
+                summary = "summary2",
+                publishedAt = "2021-02-03T11:00:00.000Z"
+            ),
+            ArticleService.ArticleResponse(
+                id = "id3",
+                title = "title3",
+                url = "url3",
+                imageUrl = "imageUrl3",
+                newsSite = "newsSite3",
+                summary = "summary3",
+                publishedAt = "2021-02-03T11:00:00.000Z"
+            )
+        )
+        coEvery { articleService.getArticles() } returns Response.success(listArticleResponse)
+        mockkObject(FeatureManager)
+        every { FeatureManager.numberOfArticlesAvailable() } returns NumberOfResources.Unlimited
+
+        // When
+        val result = dataSource.getArticle()
+
+        // Then
+        coVerify(exactly = 1) { articleService.getArticles() }
+        assertTrue(result is ResultState.Success)
+        assertEquals(3, (result as ResultState.Success).data.size)
+    }
+
+    @Test
+    fun `Given api response success, when repository get articles and number of resources is limited but greater than list size, should return ResultState Success and all available articles`() = coroutinesTestRule.testDispatcher.runBlockingTest {
+
+        // Given
+        val listArticleResponse = listOf(
+            ArticleService.ArticleResponse(
+                id = "id1",
+                title = "title1",
+                url = "url1",
+                imageUrl = "imageUrl1",
+                newsSite = "newsSite1",
+                summary = "summary1",
+                publishedAt = "2021-02-03T11:00:00.000Z"
+            ),
+            ArticleService.ArticleResponse(
+                id = "id2",
+                title = "title2",
+                url = "url2",
+                imageUrl = "imageUrl2",
+                newsSite = "newsSite2",
+                summary = "summary2",
+                publishedAt = "2021-02-03T11:00:00.000Z"
+            ),
+            ArticleService.ArticleResponse(
+                id = "id3",
+                title = "title3",
+                url = "url3",
+                imageUrl = "imageUrl3",
+                newsSite = "newsSite3",
+                summary = "summary3",
+                publishedAt = "2021-02-03T11:00:00.000Z"
+            )
+        )
+        coEvery { articleService.getArticles() } returns Response.success(listArticleResponse)
+        mockkObject(FeatureManager)
+        every { FeatureManager.numberOfArticlesAvailable() } returns NumberOfResources.Limited(5)
+
+        // When
+        val result = dataSource.getArticle()
+
+        // Then
+        coVerify(exactly = 1) { articleService.getArticles() }
+        assertTrue(result is ResultState.Success)
+        assertEquals(3, (result as ResultState.Success).data.size)
     }
 
     @Test

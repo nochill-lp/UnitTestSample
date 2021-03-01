@@ -9,6 +9,6 @@ object FeatureManager {
     }
 
     fun numberOfArticlesAvailable(): NumberOfResources{
-        return NumberOfResources.Limited(15)
+        return NumberOfResources.Limited(2)
     }
 }

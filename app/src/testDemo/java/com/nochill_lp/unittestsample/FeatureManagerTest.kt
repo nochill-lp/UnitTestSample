@@ -15,6 +15,6 @@ class FeatureManagerTest{
     @Test
     fun numberOfArticleAvailableTest(){
         assertEquals(FeatureManager.numberOfArticlesAvailable()::class, NumberOfResources.Limited::class)
-        assertEquals(15, (FeatureManager.numberOfArticlesAvailable() as NumberOfResources.Limited).limit)
+        assertEquals(2, (FeatureManager.numberOfArticlesAvailable() as NumberOfResources.Limited).limit)
     }
 }

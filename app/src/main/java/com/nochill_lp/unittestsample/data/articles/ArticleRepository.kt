@@ -1,8 +1,10 @@
 package com.nochill_lp.unittestsample.data.articles
 
+import com.nochill_lp.unittestsample.FeatureManager
 import com.nochill_lp.unittestsample.data.api.NetworkResource
 import com.nochill_lp.unittestsample.data.api.safeApiCall
 import com.nochill_lp.unittestsample.domain.ResultState
+import com.nochill_lp.unittestsample.domain.model.NumberOfResources
 import com.nochill_lp.unittestsample.domain.model.article.Article
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
 import com.nochill_lp.unittestsample.domain.model.article.ArticlesNotFound
@@ -31,7 +33,12 @@ class ArticleRepository(
             }
 
             when(result){
-                is NetworkResource.Success -> ResultState.Success(result.data?.map { it.toArticle() } ?: emptyList())
+                is NetworkResource.Success -> ResultState.Success(
+                    when(val numberOfResources = FeatureManager.numberOfArticlesAvailable()){
+                        is NumberOfResources.Unlimited -> result.data?.map { it.toArticle() } ?: emptyList()
+                        is NumberOfResources.Limited -> result.data?.take(numberOfResources.limit)?.map { it.toArticle() } ?: emptyList()
+                    }
+                )
                 is NetworkResource.Error -> ResultState.Error(ArticlesNotFound())
             }
         }
