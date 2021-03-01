@@ -1,5 +1,6 @@
 package com.nochill_lp.unittestsample
 
+import com.nochill_lp.unittestsample.domain.model.NumberOfResources
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,7 +13,7 @@ class FeatureManagerTest{
 
 
     @Test
-    fun getFeedSourcesTest(){
-        assertEquals(4, FeatureManager.getFeedSources().size)
+    fun numberOfArticleAvailableTest(){
+        assertEquals(FeatureManager.numberOfArticlesAvailable()::class, NumberOfResources.Unlimited::class)
     }
 }

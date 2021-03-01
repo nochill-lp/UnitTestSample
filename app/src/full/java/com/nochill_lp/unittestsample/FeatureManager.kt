@@ -1,17 +1,14 @@
 package com.nochill_lp.unittestsample
 
+import com.nochill_lp.unittestsample.domain.model.NumberOfResources
+
 object FeatureManager {
 
     fun isExpandArticleEnabled(): Boolean {
         return true
     }
 
-    fun getFeedSources(): List<String>{
-        return listOf(
-            "Washington Post",
-            "New York Times",
-            "Los Angeles Post",
-            "Miami Herald"
-        )
+    fun numberOfArticlesAvailable(): NumberOfResources{
+        return NumberOfResources.Unlimited
     }
 }
