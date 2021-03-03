@@ -1,15 +1,15 @@
 package com.nochill_lp.unittestsample.ui.articlelist.viewmodel
 
+import android.content.Context
 import com.nochill_lp.unittestsample.CoroutineBaseTest
 import com.nochill_lp.unittestsample.domain.ResultState
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
 import com.nochill_lp.unittestsample.domain.model.article.ArticlesNotFound
 import com.nochill_lp.unittestsample.domain.model.article.article
+import com.nochill_lp.unittestsample.extensions.getUserConnectivityType
 import com.nochill_lp.unittestsample.ui.UIState
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.unmockkAll
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -21,13 +21,17 @@ class ArticleListViewModelTest: CoroutineBaseTest(){
 
     @MockK
     private lateinit var articleDataSource: ArticleDataSource
+    @MockK
+    private lateinit var context: Context
 
     private lateinit var viewModel: ArticleListViewModel
 
     @Before
     fun initialize(){
         MockKAnnotations.init(this)
-        viewModel = ArticleListViewModel(articleDataSource)
+        mockkStatic("com.nochill_lp.unittestsample.extensions.ContextExtensionsKt")
+        every { context.getUserConnectivityType() } returns "wifi"
+        viewModel = ArticleListViewModel(context, articleDataSource)
     }
 
     @Test

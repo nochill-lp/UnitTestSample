@@ -24,7 +24,7 @@ val appModule = module {
         RetrofitClient(androidApplication()).createServiceAPI(ArticleService::class)
     }
 
-    viewModel { ArticleListViewModel(get()) }
+    viewModel { ArticleListViewModel(get(), get()) }
 
     single<ArticleDataSource> { ArticleRepository(get()) }
 }

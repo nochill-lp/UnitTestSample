@@ -12,6 +12,7 @@ import com.nochill_lp.unittestsample.data.articles.ArticleService
 import com.nochill_lp.unittestsample.domain.ResultState
 import com.nochill_lp.unittestsample.domain.model.article.Article
 import com.nochill_lp.unittestsample.domain.model.article.ArticleDataSource
+import com.nochill_lp.unittestsample.extensions.getUserConnectivityType
 import com.nochill_lp.unittestsample.ui.UIState
 import com.nochill_lp.unittestsample.ui.toUIState
 import kotlinx.coroutines.delay
@@ -27,6 +28,7 @@ import retrofit2.Retrofit
 */
 
 class ArticleListViewModel(
+    private val context: Context,
     private val articleDataSource: ArticleDataSource
 ): ViewModel() {
 
@@ -35,8 +37,14 @@ class ArticleListViewModel(
 
     fun loadArticles(){
         viewModelScope.launch {
+
+            logAnalytics()
             _articlesState.value = UIState.Loading
             _articlesState.value = articleDataSource.getArticle().toUIState()
         }
+    }
+
+    private fun logAnalytics(){
+        val networkType = context.getUserConnectivityType()
     }
 }
