@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nochill_lp.unittestsample.FeatureManager
 import com.nochill_lp.unittestsample.data.api.RetrofitClient
 import com.nochill_lp.unittestsample.data.articles.ArticleRepository
 import com.nochill_lp.unittestsample.data.articles.ArticleService
@@ -38,6 +39,7 @@ class ArticleListViewModel(
     fun loadArticles(){
         viewModelScope.launch {
 
+
             logAnalytics()
             _articlesState.value = UIState.Loading
             _articlesState.value = articleDataSource.getArticle().toUIState()
@@ -45,6 +47,8 @@ class ArticleListViewModel(
     }
 
     private fun logAnalytics(){
-        val networkType = context.getUserConnectivityType()
+        if(FeatureManager.analyticsEnabled){
+            val networkType = context.getUserConnectivityType()
+        }
     }
 }

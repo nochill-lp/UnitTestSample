@@ -11,4 +11,6 @@ object FeatureManager {
     fun numberOfArticlesAvailable(): NumberOfResources{
         return NumberOfResources.Limited(2)
     }
+
+    val analyticsEnabled = true
 }
